@@ -12,7 +12,6 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import os
 import uvicorn
-from multiprocessing import Process
 from dotenv import load_dotenv
 
 # Загружаем переменные окружения
@@ -78,10 +77,14 @@ rank_menu = InlineKeyboardMarkup(
 # Команда /start
 @dp.message(Command(commands=["start"]))
 async def start(message: Message):
-    await message.answer(
-        f"Привет, {message.from_user.first_name}! 👋\nДобро пожаловать в наш бот по покупке буста!\nВыберите нужный раздел:",
-        reply_markup=main_menu
-    )
+    try:
+        await message.answer(
+            f"Привет, {message.from_user.first_name}! 👋\nДобро пожаловать в наш бот по покупке буста!\nВыберите нужный раздел:",
+            reply_markup=main_menu
+        )
+    except Exception as e:
+        logger.error(f"Error while handling /start: {e}")
+        await message.answer("Произошла ошибка. Попробуйте снова позже.")
 
 # Ответ на кнопки главного меню
 @dp.message(lambda msg: msg.text == "📈 Заказать буст")
@@ -155,8 +158,8 @@ async def confirm_rank(callback_query: CallbackQuery):
         "description": f"Оплата за буст {rank_name}",
         "order_id": f"order_{rank_key}_{callback_query.from_user.id}",
         "version": "3",
-        "result_url": "https://your-bot-result-url.com/payment-success",
-        "server_url": "https://your-bot-server-url.com/payment-callback"
+        "result_url": "https://your-bot-url.com/payment-success",
+        "server_url": "https://your-bot-url.com/payment-callback"
     }
     link = liqpay.cnb_link(params)
 
@@ -175,11 +178,10 @@ async def payment_callback(request: Request):
 async def payment_success():
     return JSONResponse(content={"message": "Оплата успешно завершена!"})
 
-# Запуск бота и FastAPI в разных процессах
+# Запуск бота и FastAPI в одном процессе
 async def main():
     # Запускаем FastAPI
-    process = Process(target=lambda: uvicorn.run(app, host="0.0.0.0", port=8000))
-    process.start()
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
 
     # Запускаем бота
     await bot.delete_webhook(drop_pending_updates=True)
@@ -188,3 +190,4 @@ async def main():
 if __name__ == "__main__":
     # Запуск бота и FastAPI
     asyncio.run(main())
+)
