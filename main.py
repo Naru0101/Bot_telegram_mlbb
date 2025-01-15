@@ -22,10 +22,10 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Ваши токены из .env файла
-TOKEN = os.getenv("7351624325:AAFTBygn7xpOMTRUjAQyyZ4Cv99Kb2fv1f8")
-LIQPAY_PUBLIC_KEY = os.getenv("sandbox_i4034084057")
-LIQPAY_PRIVATE_KEY = os.getenv("sandbox_NgvrdophpSTAMroSAZmLRyZt9BJdrwoDQWQets5x")
+# Получаем токен и ключи из .env файла
+TOKEN = os.getenv("TOKEN")
+LIQPAY_PUBLIC_KEY = os.getenv("LIQPAY_PUBLIC_KEY")
+LIQPAY_PRIVATE_KEY = os.getenv("LIQPAY_PRIVATE_KEY")
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
