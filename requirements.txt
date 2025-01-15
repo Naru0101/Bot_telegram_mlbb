@@ -2,3 +2,4 @@ fastapi==0.95.0
 uvicorn==0.18.0
 aiogram==2.23.0
 liqpay==1.1.1
+python-dotenv==0.21.1
